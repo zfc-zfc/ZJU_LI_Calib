@@ -54,21 +54,38 @@ CalibInterface::CalibInterface(ros::NodeHandle& nh) :
       pangolin_colors_.emplace_back(cw.GetUniqueColour());
     }
   } else {
-    Initialization();
+      struct timeval tv1, tv2, tv3, tv4;
+      gettimeofday(&tv1,NULL);//获取开始时间
 
-    DataAssociation();
+      Initialization();
 
-    BatchOptimization();
+      gettimeofday(&tv2,NULL);
 
-    for (size_t iter = 0; iter < 7; iter++)
-      Refinement();
+      cout << "Initialization Time(ms): " << tv2.tv_sec*1000 + tv2.tv_usec/1000 - (tv1.tv_sec*1000 + tv1.tv_usec/1000) << endl;  //毫秒
 
-    opt_time_offset_ = true;
-    Refinement();
+      DataAssociation();
 
-    saveMap();
-	std::cout << "Calibration finished." << std::endl;
+
+      BatchOptimization();
+
+      gettimeofday(&tv3,NULL);
+
+      for (size_t iter = 0; iter < 7; iter++)
+        Refinement();
+
+      gettimeofday(&tv4,NULL);
+
+      cout << "Refinement Time(ms): " << tv4.tv_sec*1000 + tv4.tv_usec/1000 - (tv3.tv_sec*1000 + tv3.tv_usec/1000) << endl;  //毫秒
+
+      cout << "Total Calibration Time(ms): " << tv4.tv_sec*1000 + tv4.tv_usec/1000 - (tv1.tv_sec*1000 + tv1.tv_usec/1000) << endl;  //毫秒
+
+        opt_time_offset_ = true;
+        Refinement();
+
+        saveMap();
+	    std::cout << "Calibration finished." << std::endl;
   }
+
 }
 
 

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
     <arg name="topic_imu"           default="/mavros/imu/data_raw/sync" />
-    <arg name="path_bag"            default="/home/dji/Downloads/Rosbag/pandarXT/hesai_mavros_sync_lab1.bag" />
+    <arg name="path_bag"            default="/home/dji/Downloads/Rosbag/pandarXT/hesai_mavros_sync_boyu5.bag" />
     <arg name="bag_start"           default="1" />
-    <arg name="bag_durr"            default="30" />
+    <arg name="bag_durr"            default="60" />
     <arg name="scan4map"            default="15" />
     <arg name="lidar_model"         default="PandarXT" />
     <arg name="ndtResolution"       default="0.5" /> <!-- 0.5 for indoor case and 1.0 for outdoor case -->
@@ -11,7 +11,7 @@
     <arg name="time_offset_padding" default="0.015" />
     <arg name="show_ui"    default="false" />
 
-    <node pkg="li_calib" type="li_calib_gui" name="li_calib_gui" output="screen" launch-prefix="gdb -ex run --args">
+    <node pkg="li_calib" type="li_calib_gui" name="li_calib_gui" output="screen" >
     <!-- <node pkg="li_calib" type="li_calib_gui" name="li_calib_gui" output="screen" clear_params="true" launch-prefix="gdb -ex run &#45;&#45;args">-->
 
         <param name="topic_imu"         type="string"   value="$(arg topic_imu)" />
@@ -26,5 +26,5 @@
         <param name="time_offset_padding"   type="double"   value="$(arg time_offset_padding)" />
         <param name="show_ui"               type="bool"     value="$(arg show_ui)" />
     </node>
-
+launch-prefix="gdb -ex run --args"
 </launch>

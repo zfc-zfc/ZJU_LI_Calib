@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="topic_imu"           default="/imu1/raw/data_withSync" />
-    <arg name="path_bag"            default="/home/$(env USER)/rosbag/VLP_16/Garage-01.bag" />
+    <arg name="topic_imu"           default="/imu1/data_sync" />
+    <arg name="path_bag"            default="/home/dji/workspace/ZJU_LICalib_ws/bag/Garage-01.bag" />
     <arg name="bag_start"           default="1" />
     <arg name="bag_durr"            default="30" />
     <arg name="scan4map"            default="15" />

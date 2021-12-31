@@ -148,22 +148,18 @@ void CalibrHelper::DataAssociation() {
   TicToc timer;
   timer.tic();
 
-  /// set surfel pap
+  /// set surfel map
   if (InitializationDone == calib_step_ ) {
     Mapping();
     scan_undistortion_->undistortScanInMap(lidar_odom_->get_odom_data());
     surfel_association_->setSurfelMap(lidar_odom_->getNDTPtr(), map_time_);
   } else if (BatchOptimizationDone == calib_step_ || RefineDone == calib_step_) {
+
     scan_undistortion_->undistortScanInMap();
     plane_lambda_ = 0.7;
     surfel_association_->setPlaneLambda(plane_lambda_);
 
     auto ndt_omp = LiDAROdometry::ndtInit(ndt_resolution_);
-
-    //Modify here
-//    pcl::PointCloud<pcl::PointXYZI>::Ptr ndt_input;
-//    VPointCloud2PCLXYZI(scan_undistortion_->get_map_cloud(),ndt_input);
-//      ndt_omp->setInputTarget(ndt_input);
 
     ndt_omp->setInputTarget(scan_undistortion_->get_map_cloud());
     surfel_association_->setSurfelMap(ndt_omp, map_time_);
@@ -179,10 +175,7 @@ void CalibrHelper::DataAssociation() {
     if (iter == scan_undistortion_->get_scan_data_in_map().end()) {
       continue;
     }
-
-      cout << "================== " <<endl;
     surfel_association_->getAssociation(iter->second, scan_raw.makeShared(), 2);
-      cout << "================== " <<endl;
   }
   surfel_association_->averageTimeDownSmaple();
   std::cout << "Surfel point number: "

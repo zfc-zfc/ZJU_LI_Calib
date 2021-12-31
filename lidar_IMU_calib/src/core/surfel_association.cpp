@@ -120,21 +120,14 @@ void SurfelAssociation::getAssociation(const VPointCloud::Ptr& scan_inM,
     associatedFlag[i] = -1;
   }
 
-//#pragma omp parallel for num_threads(omp_get_max_threads())   //多线程关闭
+#pragma omp parallel for num_threads(omp_get_max_threads())   //多线程
 
   for (int plane_id = 0; plane_id < surfel_planes_.size(); plane_id++) {
     std::vector<std::vector<int>> ring_masks;
-    if(height > 1)
-        ring_masks.resize(height);
-    else
-        ring_masks.resize(32);
-
     associateScanToSurfel(plane_id, scan_inM, associated_radius_, ring_masks);
-
-//    cout << "============got here=============" <<endl;
-
     if(height > 1){
         for (int h = 0; h < height; h++) {
+            cout << "ring_masks.at(h).size() = " <<  ring_masks.at(h).size() <<endl;
             if (ring_masks.at(h).size() < selected_num_per_ring*2)
                 continue;
             int step = ring_masks.at(h).size() / (selected_num_per_ring + 1);
@@ -152,13 +145,10 @@ void SurfelAssociation::getAssociation(const VPointCloud::Ptr& scan_inM,
             step = std::max(step, 1);
             for (int selected = 0; selected < selected_num_per_ring; selected++) {
                 int w = ring_masks.at(h).at(step * (selected+1) - 1);
-                associatedFlag[h*width + w] = plane_id;
+                associatedFlag[h*width/32 + w] = plane_id;
             }
         }
     }
-
-
-
   }
 
   // in chronological order
@@ -200,8 +190,6 @@ void SurfelAssociation::getAssociation(const VPointCloud::Ptr& scan_inM,
           spoints_all_.push_back(spoint);
       }
   }
-
-
 }
 
 
@@ -328,14 +316,11 @@ void SurfelAssociation::associateScanToSurfel(
       int width[32] = {0};
       for (int i = 0; i < scan->points.size(); i++) {
           int ring = scan->at(i).intensity;
-//          cout << "ring = " << ring << ", ring_masks_temp[ring].size = " << ring_masks_temp[ring].size() << endl ;
           if (!pcl_isnan(scan->at(i).x) &&
               scan->at(i).x > box_min[0] && scan->at(i).x < box_max[0] &&
               scan->at(i).y > box_min[1] && scan->at(i).y < box_max[1] &&
               scan->at(i).z > box_min[2] && scan->at(i).z < box_max[2]) {
-
               Eigen::Vector3d point(scan->at(i).x, scan->at(i).y, scan->at(i).z);
-
               if (point2PlaneDistance(point, plane_coeffs) <= radius) {
                   ring_masks_temp[ring].push_back(width[ring]);
               }

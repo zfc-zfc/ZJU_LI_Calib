@@ -45,7 +45,7 @@ public:
       Eigen::Vector3d p_L0_in_G;
       double scan_timestamp = pcl_conversions::fromPCL(scan_raw.header.stamp).toSec();
       if (!traj_manager_->evaluateLidarPose(scan_timestamp, q_L0_to_G, p_L0_in_G)) {
-        std::cout << "[ScanUndistortion] : pass " << scan_timestamp << std::endl;
+        std::cout << "[Scan Undistortion] : pass " << scan_timestamp << std::endl;
         continue;
       }
 
@@ -65,11 +65,16 @@ public:
     traj_manager_->evaluateLidarPose(map_start_time, q_L0_to_G, p_L0_in_G);
 
     for (const TPointCloud& scan_raw: dataset_reader_->get_scan_data()) {
+//        struct timeval tv1, tv2;
+//        gettimeofday(&tv1,NULL);
       VPointCloud::Ptr scan_in_target(new VPointCloud);
       undistort(q_L0_to_G.conjugate(), p_L0_in_G, scan_raw,
                 scan_in_target, correct_position);
       scan_data_in_map_.insert({scan_in_target->header.stamp, scan_in_target});
       *map_cloud_ += *scan_in_target;
+//        gettimeofday(&tv2,NULL);
+//        cout << "Deskew Time per Scan(ms): " << tv2.tv_sec*1000 + tv2.tv_usec/1000 - (tv1.tv_sec*1000 + tv1.tv_usec/1000) << endl;  //毫秒
+
     }
   }
 
